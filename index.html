@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>English Learning App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    body {
+      font-family: 'Noto Sans Bengali', sans-serif; /* Use Bangla font */
+    }
+
+    /* Extend Tailwind with custom background color */
+    @layer utilities {
+      .bg-custom-light {
+        background-color: #F3F5F9;
+      }
+    }
+
+    /* Custom animation for card appearance */
+    @keyframes cardFadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Transition effect for tab buttons */
+    .tab-btn {
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-custom-light text-gray-800">
+
+  <!-- Fixed Navbar with gray-100 background -->
+  <div class="fixed top-0 w-full bg-gray-100 z-10 shadow-none">
+    <ul class="flex justify-between max-w-4xl mx-auto text-center text-gray-500 rounded-lg p-1">
+      <li class="flex-grow">
+        <a id="tab1-btn" href="#tab1" class="tab-btn flex justify-center py-4 rounded-lg mx-2 bg-white text-blue-600"> <!-- Set active tab to blue-600 -->
+          প্রথম পত্র
+        </a>
+      </li>
+      <li class="flex-grow">
+        <a id="tab2-btn" href="#tab2" class="tab-btn flex justify-center py-4 rounded-lg mx-2">
+          দ্বিতীয় পত্র
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="w-full max-w-4xl mx-auto mt-16 px-4">
+    <input type="text" id="search-input" placeholder="Search questions..."
+           class="mt-3 border-none border-gray-300 rounded-lg p-2 w-full bg-white text-gray-800 focus:border-blue-500 focus:outline-none" />
+  </div>
+
+  <!-- Main Content -->
+  <div class="w-full max-w-4xl mx-auto mt-4 px-4">
+    <div id="content-container" class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+  </div>
+
+  <!-- JavaScript for tab switching and loading content -->
+  <script>
+    // JSON data for Tab 1 and Tab 2
+const data = {
+    tab1: [
+        { id: 1, title: 'জীববিজ্ঞানের মৌলিক উপাদান কি?', description: 'জীববিজ্ঞানের মৌলিক উপাদান হলো কোষ।' },
+        { id: 2, title: 'পানি জীবনের জন্য কতটা গুরুত্বপূর্ণ?', description: 'পানি জীবনের জন্য অত্যন্ত গুরুত্বপূর্ণ, এটি সকল জীবের জন্য অপরিহার্য।' },
+        { id: 3, title: 'জীবিত ও অজীবিতের মধ্যে পার্থক্য কি?', description: 'জীবিত হল সেইসব যা বৃদ্ধি, প্রজনন এবং পরিবেশের সাথে সঙ্গতিপূর্ণভাবে সাড়া দেয়, অজীবিত হচ্ছে সেইসব যা এই বৈশিষ্ট্যগুলো প্রকাশ করে না।' }
+    ],
+    tab2: [
+        { id: 1, title: 'ফটোসিনথেসিস কি?', description: 'ফটোসিনথেসিস হল একটি প্রক্রিয়া যার মাধ্যমে সবুজ উদ্ভিদ সূর্যালোক ব্যবহার করে ক্লোরোফিলের সাহায্যে খাদ্য সংশ্লেষ করে।' },
+        { id: 2, title: 'কোষের ঝিল্লির কার্যকারিতা কি?', description: 'কোষের ঝিল্লি কোষকে রক্ষা করে এবং কোষের ভিতরে এবং বাইরে কি প্রবাহিত হয় তা নিয়ন্ত্রণ করে।' },
+        { id: 3, title: 'একটি কোষের প্রধান অংশগুলো কি কি?', description: 'একটি কোষের প্রধান অংশগুলো হলো নিউক্লিয়াস, সাইটোপ্লাজম, এবং কোষের ঝিল্লি।' }
+    ]
+};
+
+
+    const contentContainer = document.getElementById('content-container');
+    const tab1Btn = document.getElementById('tab1-btn');
+    const tab2Btn = document.getElementById('tab2-btn');
+    const searchInput = document.getElementById('search-input');
+
+    // Function to generate content cards based on the active tab
+    function loadContent(tab) {
+      contentContainer.innerHTML = ''; // Clear existing content
+      data[tab].forEach(item => {
+        const card = document.createElement('div'); 
+        card.className = 'content-card pl-4 pr-4 pt-2 pb-4 bg-white rounded-lg relative animate__animated animate__fadeIn'; // Animation class
+
+        card.innerHTML = `
+          <div class="flex flex-col">
+            <span class="text-gray-400 text-sm inline-block">${item.id}</span>
+            <span class="text-blue-500 text-sm inline-block text-gray-800">প্রশ্নঃ <span class="text-black text-md">${item.title}</span></span>
+            <span class="text-green-500 text-sm mt-1 inline-block">উত্তরঃ <span class="text-black text-md">${item.description}</span></span>
+          </div>
+        `;
+        contentContainer.appendChild(card);
+      });
+    }
+
+    // Function to filter content based on search input
+    function filterContent(searchTerm, tab) {
+      const filteredData = data[tab].filter(item =>
+        item.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      loadFilteredContent(filteredData);
+    }
+
+    // Function to load filtered content
+    function loadFilteredContent(filteredData) {
+      contentContainer.innerHTML = ''; // Clear existing content
+      filteredData.forEach(item => {
+        const card = document.createElement('div'); 
+        card.className = 'content-card pl-4 pr-4 pt-2 pb-4 bg-white rounded-lg relative animate__animated animate__fadeIn';
+
+        card.innerHTML = `
+          <div class="flex flex-col">
+            <span class="text-gray-400 text-sm inline-block">${item.id}</span>
+            <span class="text-blue-500 text-sm inline-block text-gray-800">প্রশ্নঃ <span class="text-black text-md">${item.title}</span></span>
+            <span class="text-green-500 text-sm mt-1 inline-block">উত্তরঃ <span class="text-black text-md">${item.description}</span></span>
+          </div>
+        `;
+        contentContainer.appendChild(card);
+      });
+    }
+
+    // Event listeners for tab switching
+    tab1Btn.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      loadContent('tab1');
+      tab1Btn.classList.add('bg-white', 'text-blue-600'); // Set active tab color to blue-600
+      tab2Btn.classList.remove('bg-white', 'text-blue-600'); // Remove active tab color from inactive tab
+      searchInput.value = ''; // Clear search input on tab switch
+      filterContent('', 'tab1'); // Load tab 1 content
+    });
+
+    tab2Btn.addEventListener('click', (e) => {
+      e.preventDefault(); // Prevent default anchor behavior
+      loadContent('tab2');
+      tab2Btn.classList.add('bg-white', 'text-blue-600'); // Set active tab color to blue-600
+      tab1Btn.classList.remove('bg-white', 'text-blue-600'); // Remove active tab color from inactive tab
+      searchInput.value = ''; // Clear search input on tab switch
+      filterContent('', 'tab2'); // Load tab 2 content
+    });
+
+    // Event listener for search input
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value;
+      const activeTab = tab1Btn.classList.contains('bg-white') ? 'tab1' : 'tab2'; // Determine active tab
+      filterContent(searchTerm, activeTab);
+    });
+
+    // Load Tab 1 content by default
+    loadContent('tab1');
+  </script>
+
+  <!-- Include Animate.css for additional animations -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+</body>
+</html>
